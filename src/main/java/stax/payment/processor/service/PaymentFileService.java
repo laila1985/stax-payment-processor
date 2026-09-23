@@ -1,4 +1,11 @@
-package com.example.payment.service;
+package stax.payment.processor.service;
+
+import org.springframework.stereotype.Service;
+import stax.payment.processor.parser.PaymentXmlParser;
+import stax.payment.processor.repository.PaymentRepository;
+import stax.payment.processor.validator.PaymentValidator;
+
+import java.io.InputStream;
 
 @Service
 public class PaymentFileService {
@@ -18,6 +25,11 @@ public class PaymentFileService {
     }
 
     public ProcessingResult process(InputStream inputStream)
+            throws Exception {
+        return null;
+    }
+
+    public ProcessingResult processFile(InputStream inputStream)
             throws Exception {
 
         ProcessingResult result = new ProcessingResult();

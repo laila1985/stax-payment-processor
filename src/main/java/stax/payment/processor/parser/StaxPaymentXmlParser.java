@@ -1,6 +1,7 @@
-package com.example.payment.parser;
+package stax.payment.processor.parser;
 
-import com.example.payment.model.Payment;
+import org.springframework.stereotype.Component;
+import stax.payment.processor.model.Payment;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -8,6 +9,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.function.Consumer;
 
 @Component
 public class StaxPaymentXmlParser
@@ -59,11 +61,11 @@ public class StaxPaymentXmlParser
                         break;
 
                     case "debtor":
-                        payment.setDebtor(readParty(reader));
+                        payment.setDebtorName(readParty(reader));
                         break;
 
                     case "creditor":
-                        payment.setCreditor(readParty(reader));
+                        payment.setCreditorName(readParty(reader));
                         break;
 
                     case "amount":
@@ -89,5 +91,9 @@ public class StaxPaymentXmlParser
         }
 
         return payment;
+    }
+
+    private String readParty(XMLStreamReader reader) {
+        return "party";
     }
 }

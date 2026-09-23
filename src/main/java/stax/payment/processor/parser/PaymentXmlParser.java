@@ -1,6 +1,7 @@
-package com.example.payment.parser;
+package stax.payment.processor.parser;
 
-import com.example.payment.model.Payment;
+
+import stax.payment.processor.model.Payment;
 
 import java.io.InputStream;
 import java.util.function.Consumer;

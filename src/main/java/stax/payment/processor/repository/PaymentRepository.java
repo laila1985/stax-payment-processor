@@ -1,7 +1,7 @@
-package com.example.payment.repository;
+package stax.payment.processor.repository;
 
-import com.example.payment.model.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
+import stax.payment.processor.model.Payment;
 
 import java.util.Optional;
 

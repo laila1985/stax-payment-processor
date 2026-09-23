@@ -1,4 +1,4 @@
-package com.example.payment.exception;
+package stax.payment.processor.exceptions;
 
 public class PaymentParsingException {
 }

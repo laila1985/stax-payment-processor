@@ -1,9 +1,11 @@
-package com.example.payment.controller;
+package stax.payment.processor.controller;
 
-import com.example.payment.service.PaymentFileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import stax.payment.processor.service.PaymentFileService;
+
+import java.io.InputStream;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -17,14 +19,14 @@ public class PaymentController {
 
     @PostMapping("/files")
     public ResponseEntity<String> uploadPaymentFile(
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("file") MultipartFile file) throws Exception {
 
         if (file.isEmpty()) {
             return ResponseEntity.badRequest()
                     .body("File cannot be empty");
         }
 
-        paymentFileService.processFile(file);
+        paymentFileService.process((InputStream) file);
 
         return ResponseEntity.ok("Payment file processed successfully");
     }

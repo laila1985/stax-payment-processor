@@ -1,4 +1,4 @@
-package com.example.payment.model;
+package stax.payment.processor.model;
 
 import java.time.LocalDate;
 

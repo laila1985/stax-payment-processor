@@ -1,4 +1,4 @@
-package com.example.payment.model;
+package stax.payment.processor.model;
 
 public class Party {
 

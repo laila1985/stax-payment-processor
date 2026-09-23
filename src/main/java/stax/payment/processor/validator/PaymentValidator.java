@@ -1,4 +1,7 @@
-package com.example.payment.validator;
+package stax.payment.processor.validator;
+
+import org.springframework.stereotype.Component;
+import stax.payment.processor.model.Payment;
 
 @Component
 public class PaymentValidator {
@@ -15,11 +18,11 @@ public class PaymentValidator {
             return false;
         }
 
-        if (payment.getDebtor() == null) {
+        if (payment.getDebtorName() == null) {
             return false;
         }
 
-        if (payment.getCreditor() == null) {
+        if (payment.getCreditorName() == null) {
             return false;
         }
 

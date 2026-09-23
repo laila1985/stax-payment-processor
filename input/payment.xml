@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<paymentFile>
+    <fileId>FILE-001</fileId>
+    <creationDate>2026-09-22</creationDate>
+
+    <payments>
+
+        <payment>
+            <paymentId>PAY-001</paymentId>
+            <debtor>
+                <name>John Smith</name>
+                <iban>FR761234567890</iban>
+            </debtor>
+            <creditor>
+                <name>ABC Company</name>
+                <iban>FR761111222233</iban>
+            </creditor>
+            <amount currency="EUR">1500.50</amount>
+        </payment>
+
+        <payment>
+            <paymentId>PAY-002</paymentId>
+            <debtor>
+                <name>Alice Smith</name>
+                <iban>FR769999888877</iban>
+            </debtor>
+            <creditor>
+                <name>XYZ Company</name>
+                <iban>FR761111333344</iban>
+            </creditor>
+            <amount currency="EUR">250.00</amount>
+        </payment>
+
+    </payments>
+</paymentFile>

@@ -7,10 +7,12 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:payment}
     password: ${SPRING_DATASOURCE_PASSWORD:payment}
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: false
-
 server:
   port: 8080
+
+# Swagger / OpenAPI UI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

@@ -1,7 +1,12 @@
 package stax.payment.processor.parser;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import stax.payment.processor.exceptions.PaymentParsingException;
+import stax.payment.processor.model.Party;
 import stax.payment.processor.model.Payment;
+import stax.payment.processor.service.PaymentFileService;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -9,91 +14,184 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
-public class StaxPaymentXmlParser
-        implements PaymentXmlParser {
+public class StaxPaymentXmlParser {
 
-    @Override
-    public void parse(
-            InputStream inputStream,
-            Consumer<Payment> paymentConsumer)
-            throws Exception {
+    private static final Logger log =
+            LoggerFactory.getLogger(StaxPaymentXmlParser.class);
 
-        XMLInputFactory factory =
-                XMLInputFactory.newFactory();
+    public List<Payment> parse(InputStream inputStream)
+            throws PaymentParsingException {
 
-        XMLStreamReader reader =
-                factory.createXMLStreamReader(inputStream);
+        List<Payment> payments = new ArrayList<>();
 
-        while (reader.hasNext()) {
+        XMLInputFactory factory = XMLInputFactory.newFactory();
 
-            int event = reader.next();
+        // Security: do not allow DTD/external entity processing
+        factory.setProperty(
+                XMLInputFactory.SUPPORT_DTD,
+                false
+        );
 
-            if (event == XMLStreamConstants.START_ELEMENT
-                    && "payment".equals(reader.getLocalName())) {
+        factory.setProperty(
+                "javax.xml.stream.isSupportingExternalEntities",
+                false
+        );
 
-                Payment payment = readPayment(reader);
+        XMLStreamReader reader = null;
 
-                paymentConsumer.accept(payment);
-            }
-        }
+        try {
 
-        reader.close();
-    }
+            reader = factory.createXMLStreamReader(inputStream);
 
-    private Payment readPayment(XMLStreamReader reader)
-            throws XMLStreamException {
+            Payment payment = null;
+            Party debtor = null;
+            Party creditor = null;
 
-        Payment payment = new Payment();
+            while (reader.hasNext()) {
 
-        while (reader.hasNext()) {
+                int event = reader.next();
 
-            int event = reader.next();
+                if (event == XMLStreamConstants.START_ELEMENT) {
 
-            if (event == XMLStreamConstants.START_ELEMENT) {
+                    String element = reader.getLocalName();
 
-                switch (reader.getLocalName()) {
+                    switch (element) {
 
-                    case "paymentId":
-                        payment.setPaymentId(reader.getElementText());
-                        break;
+                        case "payment":
+                            payment = new Payment();
+                            break;
 
-                    case "debtor":
-                        payment.setDebtorName(readParty(reader));
-                        break;
+                        case "debtor":
+                            debtor = new Party();
+                            break;
 
-                    case "creditor":
-                        payment.setCreditorName(readParty(reader));
-                        break;
+                        case "creditor":
+                            creditor = new Party();
+                            break;
 
-                    case "amount":
-                        payment.setAmount(
-                                new BigDecimal(reader.getElementText())
-                        );
+                        case "paymentId":
+                            if (payment != null) {
+                                payment.setPaymentId(
+                                        reader.getElementText()
+                                );
+                            }
+                            break;
 
-                        payment.setCurrency(
-                                reader.getAttributeValue(
-                                        null,
-                                        "currency"
-                                )
-                        );
-                        break;
+                        case "name":
+                            String name = reader.getElementText();
+
+                            if (debtor != null) {
+                                debtor.setName(name);
+                            } else if (creditor != null) {
+                                creditor.setName(name);
+                            }
+                            break;
+
+                        case "accountNumber":
+                            String accountNumber =
+                                    reader.getElementText();
+
+                            if (debtor != null) {
+                                debtor.setAccountNumber(accountNumber);
+                            } else if (creditor != null) {
+                                creditor.setAccountNumber(accountNumber);
+                            }
+                            break;
+
+                        case "bank":
+                            String bank = reader.getElementText();
+
+                            if (debtor != null) {
+                                debtor.setBank(bank);
+                            } else if (creditor != null) {
+                                creditor.setBank(bank);
+                            }
+                            break;
+
+                        case "amount":
+                            if (payment != null) {
+                                payment.setAmount(
+                                        new BigDecimal(
+                                                reader.getElementText()
+                                        )
+                                );
+                            }
+                            break;
+
+                        case "currency":
+                            if (payment != null) {
+                                payment.setCurrency(
+                                        reader.getElementText()
+                                );
+                            }
+                            break;
+
+                        default:
+                            // Ignore unknown elements for now
+                            break;
+                    }
+                }
+
+                if (event == XMLStreamConstants.END_ELEMENT) {
+
+                    String element = reader.getLocalName();
+
+                    switch (element) {
+
+                        case "debtor":
+                            if (payment != null) {
+                                payment.setDebtor(debtor);
+                            }
+                            debtor = null;
+                            break;
+
+                        case "creditor":
+                            if (payment != null) {
+                                payment.setCreditor(creditor);
+                            }
+                            creditor = null;
+                            break;
+
+                        case "payment":
+                            if (payment != null) {
+                                payments.add(payment);
+                            }
+                            payment = null;
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
             }
 
-            if (event == XMLStreamConstants.END_ELEMENT
-                    && "payment".equals(reader.getLocalName())) {
+            return payments;
 
-                break;
+        } catch (XMLStreamException | NumberFormatException e) {
+
+            throw new PaymentParsingException(
+                    "Failed to parse payment XML file",
+                    e
+            );
+
+        } finally {
+            log.info(
+                    "StAX parsing completed. {} payments found",
+                    payments.size()
+            );
+
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (XMLStreamException e) {
+                    // Parsing already completed/failed.
+                    // Nothing else to do here.
+                }
             }
         }
-
-        return payment;
-    }
-
-    private String readParty(XMLStreamReader reader) {
-        return "party";
     }
 }

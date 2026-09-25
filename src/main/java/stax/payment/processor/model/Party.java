@@ -1,15 +1,24 @@
 package stax.payment.processor.model;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class Party {
 
     private String name;
+
     private String accountNumber;
+
     private String bank;
 
     public Party() {
     }
 
-    public Party(String name, String accountNumber, String bank) {
+    public Party(
+            String name,
+            String accountNumber,
+            String bank) {
+
         this.name = name;
         this.accountNumber = accountNumber;
         this.bank = bank;

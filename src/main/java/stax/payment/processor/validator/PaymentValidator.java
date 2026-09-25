@@ -6,26 +6,30 @@ import stax.payment.processor.model.Payment;
 @Component
 public class PaymentValidator {
 
-    public boolean isValid(Payment payment) {
+    public void validate(Payment payment) {
 
-        if (payment.getPaymentId() == null) {
-            return false;
+        if (payment.getPaymentId() == null ||
+                payment.getPaymentId().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Payment ID is required"
+            );
         }
 
         if (payment.getAmount() == null ||
                 payment.getAmount().signum() <= 0) {
 
-            return false;
+            throw new IllegalArgumentException(
+                    "Payment amount must be greater than zero"
+            );
         }
 
-        if (payment.getDebtorName() == null) {
-            return false;
-        }
+        if (payment.getCurrency() == null ||
+                payment.getCurrency().isBlank()) {
 
-        if (payment.getCreditorName() == null) {
-            return false;
+            throw new IllegalArgumentException(
+                    "Currency is required"
+            );
         }
-
-        return true;
     }
 }

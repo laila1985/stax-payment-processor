@@ -15,12 +15,44 @@ public class Payment {
     @Column(nullable = false, unique = true)
     private String paymentId;
 
-    private String debtorName;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(
+                    name = "name",
+                    column = @Column(name = "debtor_name")
+            ),
+            @AttributeOverride(
+                    name = "accountNumber",
+                    column = @Column(name = "debtor_account")
+            ),
+            @AttributeOverride(
+                    name = "bank",
+                    column = @Column(name = "debtor_bank")
+            )
+    })
+    private Party debtor;
 
-    private String creditorName;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(
+                    name = "name",
+                    column = @Column(name = "creditor_name")
+            ),
+            @AttributeOverride(
+                    name = "accountNumber",
+                    column = @Column(name = "creditor_account")
+            ),
+            @AttributeOverride(
+                    name = "bank",
+                    column = @Column(name = "creditor_bank")
+            )
+    })
+    private Party creditor;
 
+    @Column(nullable = false)
     private BigDecimal amount;
 
+    @Column(nullable = false)
     private String currency;
 
     public Payment() {
@@ -28,14 +60,14 @@ public class Payment {
 
     public Payment(
             String paymentId,
-            String debtorName,
-            String creditorName,
+            Party debtor,
+            Party creditor,
             BigDecimal amount,
             String currency) {
 
         this.paymentId = paymentId;
-        this.debtorName = debtorName;
-        this.creditorName = creditorName;
+        this.debtor = debtor;
+        this.creditor = creditor;
         this.amount = amount;
         this.currency = currency;
     }
@@ -52,20 +84,20 @@ public class Payment {
         this.paymentId = paymentId;
     }
 
-    public String getDebtorName() {
-        return debtorName;
+    public Party getDebtor() {
+        return debtor;
     }
 
-    public void setDebtorName(String debtorName) {
-        this.debtorName = debtorName;
+    public void setDebtor(Party debtor) {
+        this.debtor = debtor;
     }
 
-    public String getCreditorName() {
-        return creditorName;
+    public Party getCreditor() {
+        return creditor;
     }
 
-    public void setCreditorName(String creditorName) {
-        this.creditorName = creditorName;
+    public void setCreditor(Party creditor) {
+        this.creditor = creditor;
     }
 
     public BigDecimal getAmount() {

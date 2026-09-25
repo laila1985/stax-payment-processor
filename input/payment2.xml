@@ -1,0 +1,25 @@
+<payments>
+
+    <payment>
+
+        <paymentId>PAY-10001</paymentId>
+
+        <debtor>
+            <name>John Smith</name>
+            <accountNumber>MA123456789</accountNumber>
+            <bank>Bank A</bank>
+        </debtor>
+
+        <creditor>
+            <name>ABC Company</name>
+            <accountNumber>MA987654321</accountNumber>
+            <bank>Bank B</bank>
+        </creditor>
+
+        <amount>1500.50</amount>
+
+        <currency>EUR</currency>
+
+    </payment>
+
+</payments>
